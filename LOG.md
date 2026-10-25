@@ -1,5 +1,11 @@
 # Research log
 
+## 2026-10-25 — 03 Bonferroni across looks
+
+Bonferroni (p < 0.05/K at each of K looks) holds the A/A false-positive rate at or below 5% for every peek count in the grid; at 100 looks it is 0.86% versus 37.1% naive. With true lift 0.010 and 100 looks, correct-call rate falls from 93.5% to 51.4% and inconclusive runs rise to 48.6%. Tests check the union-bound ceiling on FPR and one-look power against the normal formula.
+
+Next: Pocock boundary calibrated to 5% overall.
+
 ## 2026-10-24 — 02 Winner's curse
 
 Simulated naive peeking with true lifts of 0.005 and 0.010 (control rate 10%, 20,000 users per arm, 20,000 simulations). One look matches the truncated-normal formula: a true lift of 0.005 is estimated at 0.00806 given a correct call (formula 0.00805). With 100 looks that conditional estimate is 0.01968, while the planned-end average stays at 0.00498. On 20 looks, stopping at the first batch (1,000 users) averages 0.03245 on a correct call.

@@ -6,10 +6,10 @@ Each item should fit in one focused session: code + tests + a short write-up. Sp
 
 - [x] 01 Naive peeking: false-positive rate vs number of looks (A/A)
 - [x] 02 Peeking with a real effect: does early stopping still reach the right answer, and how biased is the estimated lift at stopping time? (winner's curse)
+- [x] 03 Bonferroni across looks: simple fix, measure how much power it loses
 
 ## Next
 
-- [ ] 03 Bonferroni across looks: simple fix, measure how much power it loses
 - [ ] 04 Pocock boundary: constant threshold calibrated by simulation to give 5% overall
 - [ ] 05 O'Brien–Fleming boundary: strict early, lenient late; compare power with Pocock
 - [ ] 06 Lan–DeMets alpha spending: allow unplanned / irregular look times

@@ -64,6 +64,42 @@ The early stops carry the exaggeration. With 20 looks and a true lift of 0.005, 
 
 ![Real effect, naive peeking](results/02_winner_curse.png)
 
+### 03 · Bonferroni across looks
+
+Same batching as before: 20,000 users per arm, 10% control rate, two-sided z-test, stop at the first look that crosses the threshold. Naive peeking uses p < 0.05 at every look. Bonferroni uses p < 0.05 / K at look K of K planned looks (union bound: overall false-positive rate ≤ 5%). 20,000 A/A simulations per point.
+
+| Looks | Naive FPR | Bonferroni FPR |
+|------:|----------:|---------------:|
+| 1 | 5.0% | 5.0% |
+| 2 | 8.3% | 4.2% |
+| 5 | 13.9% | 3.2% |
+| 10 | 19.2% | 2.4% |
+| 20 | 24.8% | 1.9% |
+| 50 | 32.2% | 1.2% |
+| 100 | 37.1% | 0.9% |
+
+Bonferroni keeps the A/A error rate at or below 5% at every peek count; it is conservative (0.9% at 100 looks). Power is the share of simulations with a first significant result in the true direction (same lifts 0.005 and 0.010 as experiment 02).
+
+True lift 0.005:
+
+| Looks | Naive correct | Bonferroni correct | Naive no call | Bonferroni no call |
+|------:|--------------:|-------------------:|--------------:|-------------------:|
+| 1 | 37.69% | 37.69% | 62.30% | 62.30% |
+| 10 | 51.53% | 19.08% | 47.34% | 80.83% |
+| 100 | 59.68% | 7.28% | 34.62% | 92.64% |
+
+True lift 0.010:
+
+| Looks | Naive correct | Bonferroni correct | Naive no call | Bonferroni no call |
+|------:|--------------:|-------------------:|--------------:|-------------------:|
+| 1 | 90.39% | 90.39% | 9.61% | 9.61% |
+| 10 | 93.44% | 73.10% | 6.34% | 26.88% |
+| 100 | 93.49% | 51.40% | 4.06% | 48.59% |
+
+With 100 daily looks and a 0.010 lift, naive peeking calls the winner correctly 93.5% of the time; Bonferroni drops that to 51.4% and leaves almost half of runs inconclusive. The fix is honest about error control but expensive in power.
+
+![Bonferroni vs naive peeking](results/03_bonferroni.png)
+
 ## Layout
 
 - `src/peeking/` — simulation and stopping-rule code
@@ -79,6 +115,7 @@ pip install -e ".[dev]"
 pytest
 python scripts/01_naive_peeking.py
 python scripts/02_winner_curse.py
+python scripts/03_bonferroni.py
 ```
 
 ## License
