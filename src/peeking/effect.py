@@ -247,14 +247,18 @@ def simulate_normal_looks(
     return z, lift
 
 
-def first_stop_index(z: np.ndarray, alpha: float = 0.05) -> np.ndarray:
+def first_stop_index(
+    z: np.ndarray,
+    alpha: float = 0.05,
+    z_critical: float | None = None,
+) -> np.ndarray:
     """Index of the first |z| past the critical value, or -1 if it never happens.
 
     z has shape (n_sims, n_looks). The returned array has shape (n_sims,).
     """
     if z.ndim != 2:
         raise ValueError("z must be two-dimensional")
-    crit = critical_z(alpha)
+    crit = critical_z(alpha) if z_critical is None else z_critical
     significant = np.abs(z) >= crit
     first = np.argmax(significant, axis=1).astype(int)
     first[~significant.any(axis=1)] = -1
@@ -309,6 +313,7 @@ def summarize_stopping(
     users_per_look: int,
     true_lift: float,
     alpha: float = 0.05,
+    z_critical: float | None = None,
 ) -> StoppingSummary:
     """Reduce per-look z and lift paths to stopping-time summaries.
 
@@ -325,8 +330,8 @@ def summarize_stopping(
     if n_sims < 1 or n_looks < 1:
         raise ValueError("z must have at least one simulation and one look")
 
-    crit = critical_z(alpha)
-    first = first_stop_index(z, alpha)
+    crit = critical_z(alpha) if z_critical is None else z_critical
+    first = first_stop_index(z, alpha, z_critical=z_critical)
     crossed = first >= 0
     rows = np.arange(n_sims)
 
@@ -392,6 +397,7 @@ def peeking_with_effect(
     alpha: float = 0.05,
     seed: int = 0,
     model: str = "binomial",
+    z_critical: float | None = None,
 ) -> StoppingSummary:
     """Simulate naive peeking at a fixed sample split into equal looks.
 
@@ -411,4 +417,6 @@ def peeking_with_effect(
     users_per_look = total_users_per_arm // n_looks
     simulator = simulate_binomial_looks if model == "binomial" else simulate_normal_looks
     z, lift = simulator(n_sims, n_looks, users_per_look, rate_control, rate_treatment, rng)
-    return summarize_stopping(z, lift, users_per_look, true_lift, alpha)
+    return summarize_stopping(
+        z, lift, users_per_look, true_lift, alpha, z_critical=z_critical
+    )

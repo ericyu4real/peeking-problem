@@ -100,6 +100,44 @@ With 100 daily looks and a 0.010 lift, naive peeking calls the winner correctly 
 
 ![Bonferroni vs naive peeking](results/03_bonferroni.png)
 
+### 04 · Pocock boundary
+
+Same batching as before. At each look, stop if the two-sided z exceeds a constant boundary z* chosen by A/A simulation so the overall false-positive rate is 5%. Naive peeking and Bonferroni from experiment 03 are included for comparison. 20,000 simulations per point; boundaries use 20,000 calibration runs per K.
+
+| Looks | z* (Pocock) | Naive FPR | Pocock FPR | Bonferroni FPR |
+|------:|------------:|----------:|-----------:|---------------:|
+| 1 | 1.960 | 5.0% | 5.0% | 5.0% |
+| 2 | 2.180 | 8.3% | 5.0% | 4.2% |
+| 5 | 2.403 | 13.9% | 5.0% | 3.2% |
+| 10 | 2.539 | 19.2% | 5.0% | 2.4% |
+| 20 | 2.670 | 24.8% | 5.0% | 1.9% |
+| 50 | 2.794 | 32.2% | 5.0% | 1.2% |
+| 100 | 2.865 | 37.1% | 5.0% | 0.9% |
+
+z* rises with more planned looks because the same bar must control a longer peeking path. Pocock lands on the nominal 5% at every K; Bonferroni stays below it.
+
+Power is the share of simulations with a first significant result in the true direction (lifts 0.005 and 0.010 as in experiment 02).
+
+True lift 0.005:
+
+| Looks | Naive correct | Pocock correct | Bonferroni correct |
+|------:|--------------:|---------------:|-------------------:|
+| 1 | 37.69% | 37.69% | 37.69% |
+| 10 | 51.53% | 27.80% | 19.08% |
+| 100 | 59.68% | 22.00% | 7.28% |
+
+True lift 0.010:
+
+| Looks | Naive correct | Pocock correct | Bonferroni correct |
+|------:|--------------:|---------------:|-------------------:|
+| 1 | 90.39% | 90.39% | 90.39% |
+| 10 | 93.44% | 81.30% | 73.10% |
+| 100 | 93.49% | 76.10% | 51.40% |
+
+With 100 looks and a 0.010 lift, Pocock calls the winner correctly 76.1% of the time versus 51.4% for Bonferroni, while both hold the A/A error rate at 5%. Pocock still loses a lot versus naive peeking (93.5% correct) because the stricter constant boundary trades power for error control.
+
+![Pocock vs Bonferroni and naive peeking](results/04_pocock.png)
+
 ## Layout
 
 - `src/peeking/` — simulation and stopping-rule code
@@ -116,6 +154,7 @@ pytest
 python scripts/01_naive_peeking.py
 python scripts/02_winner_curse.py
 python scripts/03_bonferroni.py
+python scripts/04_pocock.py
 ```
 
 ## License
