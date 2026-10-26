@@ -123,15 +123,15 @@ True lift 0.005:
 | Looks | Naive correct | Pocock correct | Bonferroni correct |
 |------:|--------------:|---------------:|-------------------:|
 | 1 | 37.69% | 37.69% | 37.69% |
-| 10 | 51.53% | 27.80% | 19.08% |
-| 100 | 59.68% | 22.00% | 7.28% |
+| 10 | 51.53% | 27.77% | 19.08% |
+| 100 | 59.68% | 22.04% | 7.28% |
 
 True lift 0.010:
 
 | Looks | Naive correct | Pocock correct | Bonferroni correct |
 |------:|--------------:|---------------:|-------------------:|
 | 1 | 90.39% | 90.39% | 90.39% |
-| 10 | 93.44% | 81.30% | 73.10% |
+| 10 | 93.44% | 81.33% | 73.10% |
 | 100 | 93.49% | 76.10% | 51.40% |
 
 With 100 looks and a 0.010 lift, Pocock calls the winner correctly 76.1% of the time versus 51.4% for Bonferroni, while both hold the A/A error rate at 5%. Pocock still loses a lot versus naive peeking (93.5% correct) because the stricter constant boundary trades power for error control.
