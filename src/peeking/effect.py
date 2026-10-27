@@ -247,10 +247,25 @@ def simulate_normal_looks(
     return z, lift
 
 
+def _resolve_z_critical(
+    alpha: float,
+    z_critical: float | np.ndarray | None,
+    n_looks: int,
+) -> float | np.ndarray:
+    if z_critical is None:
+        return critical_z(alpha)
+    crit = np.asarray(z_critical)
+    if crit.ndim == 0:
+        return float(crit)
+    if crit.shape != (n_looks,):
+        raise ValueError("z_critical must be scalar or length n_looks")
+    return crit
+
+
 def first_stop_index(
     z: np.ndarray,
     alpha: float = 0.05,
-    z_critical: float | None = None,
+    z_critical: float | np.ndarray | None = None,
 ) -> np.ndarray:
     """Index of the first |z| past the critical value, or -1 if it never happens.
 
@@ -258,7 +273,7 @@ def first_stop_index(
     """
     if z.ndim != 2:
         raise ValueError("z must be two-dimensional")
-    crit = critical_z(alpha) if z_critical is None else z_critical
+    crit = _resolve_z_critical(alpha, z_critical, z.shape[1])
     significant = np.abs(z) >= crit
     first = np.argmax(significant, axis=1).astype(int)
     first[~significant.any(axis=1)] = -1
@@ -313,7 +328,7 @@ def summarize_stopping(
     users_per_look: int,
     true_lift: float,
     alpha: float = 0.05,
-    z_critical: float | None = None,
+    z_critical: float | np.ndarray | None = None,
 ) -> StoppingSummary:
     """Reduce per-look z and lift paths to stopping-time summaries.
 
@@ -330,7 +345,7 @@ def summarize_stopping(
     if n_sims < 1 or n_looks < 1:
         raise ValueError("z must have at least one simulation and one look")
 
-    crit = critical_z(alpha) if z_critical is None else z_critical
+    crit = _resolve_z_critical(alpha, z_critical, n_looks)
     first = first_stop_index(z, alpha, z_critical=z_critical)
     crossed = first >= 0
     rows = np.arange(n_sims)
@@ -344,13 +359,15 @@ def summarize_stopping(
     if true_lift > 0.0:
         correct = crossed & (z_at_stop > 0.0)
         wrong = crossed & (z_at_stop < 0.0)
-        n_final_correct = int((z[:, -1] >= crit).sum())
-        n_final_wrong = int((z[:, -1] <= -crit).sum())
+        final_crit = crit[-1] if isinstance(crit, np.ndarray) else crit
+        n_final_correct = int((z[:, -1] >= final_crit).sum())
+        n_final_wrong = int((z[:, -1] <= -final_crit).sum())
     else:
         correct = crossed & (z_at_stop < 0.0)
         wrong = crossed & (z_at_stop > 0.0)
-        n_final_correct = int((z[:, -1] <= -crit).sum())
-        n_final_wrong = int((z[:, -1] >= crit).sum())
+        final_crit = crit[-1] if isinstance(crit, np.ndarray) else crit
+        n_final_correct = int((z[:, -1] <= -final_crit).sum())
+        n_final_wrong = int((z[:, -1] >= final_crit).sum())
 
     def _mean(values: np.ndarray) -> float:
         if values.size == 0:
@@ -397,7 +414,7 @@ def peeking_with_effect(
     alpha: float = 0.05,
     seed: int = 0,
     model: str = "binomial",
-    z_critical: float | None = None,
+    z_critical: float | np.ndarray | None = None,
 ) -> StoppingSummary:
     """Simulate naive peeking at a fixed sample split into equal looks.
 

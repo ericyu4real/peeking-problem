@@ -138,6 +138,44 @@ With 100 looks and a 0.010 lift, Pocock calls the winner correctly 76.1% of the 
 
 ![Pocock vs Bonferroni and naive peeking](results/04_pocock.png)
 
+### 05 · O'Brien–Fleming boundary
+
+Same batching as before. At look k of K, stop if |z| exceeds c·√(K/k), with c chosen by A/A simulation so the overall false-positive rate is 5%. Early looks use a much higher bar than the final look; Pocock from experiment 04 uses the same threshold at every look. 20,000 simulations per point; boundaries use 20,000 calibration runs per K.
+
+| Looks | OBF first look | OBF final look | Pocock z* | Naive FPR | OBF FPR | Pocock FPR |
+|------:|---------------:|---------------:|----------:|----------:|--------:|-----------:|
+| 1 | 1.960 | 1.960 | 1.960 | 5.0% | 5.0% | 5.0% |
+| 2 | 2.794 | 1.976 | 2.180 | 8.3% | 5.0% | 5.0% |
+| 5 | 4.509 | 2.017 | 2.403 | 13.9% | 5.0% | 5.0% |
+| 10 | 6.575 | 2.079 | 2.539 | 19.2% | 5.0% | 5.0% |
+| 20 | 9.508 | 2.126 | 2.670 | 24.8% | 5.0% | 5.0% |
+| 50 | 15.240 | 2.155 | 2.794 | 32.2% | 5.0% | 5.0% |
+| 100 | 21.826 | 2.183 | 2.865 | 37.1% | 5.0% | 5.0% |
+
+The first look is almost unreachable at many peeks; most alpha is available at the planned end, where the O'Brien–Fleming bar stays below Pocock's constant boundary.
+
+Power is the share of simulations with a first significant result in the true direction (lifts 0.005 and 0.010 as in experiment 02).
+
+True lift 0.005:
+
+| Looks | Naive correct | OBF correct | Pocock correct |
+|------:|--------------:|------------:|---------------:|
+| 1 | 37.69% | 37.69% | 37.69% |
+| 10 | 51.53% | 36.56% | 27.77% |
+| 100 | 59.68% | 35.27% | 22.04% |
+
+True lift 0.010:
+
+| Looks | Naive correct | OBF correct | Pocock correct |
+|------:|--------------:|------------:|---------------:|
+| 1 | 90.39% | 90.39% | 90.39% |
+| 10 | 93.44% | 89.11% | 81.33% |
+| 100 | 93.49% | 88.98% | 76.10% |
+
+With 100 daily looks and a 0.010 lift, O'Brien–Fleming calls the winner correctly 89.0% of the time versus 76.1% for Pocock, while both hold the A/A error rate at 5%. The gap is smaller than versus naive peeking (93.5%) because both group-sequential rules pay for error control.
+
+![O'Brien–Fleming vs Pocock](results/05_obrien_fleming.png)
+
 ## Layout
 
 - `src/peeking/` — simulation and stopping-rule code
@@ -155,6 +193,7 @@ python scripts/01_naive_peeking.py
 python scripts/02_winner_curse.py
 python scripts/03_bonferroni.py
 python scripts/04_pocock.py
+python scripts/05_obrien_fleming.py
 ```
 
 ## License

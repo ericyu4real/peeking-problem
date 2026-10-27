@@ -11,7 +11,7 @@ Each item should fit in one focused session: code + tests + a short write-up. Sp
 
 ## Next
 
-- [ ] 05 O'Brien–Fleming boundary: strict early, lenient late; compare power with Pocock
+- [x] 05 O'Brien–Fleming boundary: strict early, lenient late; compare power with Pocock
 - [ ] 06 Lan–DeMets alpha spending: allow unplanned / irregular look times
 - [ ] 07 mSPRT (mixture sequential probability ratio test) for two proportions
 - [ ] 08 Always-valid p-values from mSPRT; verify the false-positive rate holds under continuous monitoring

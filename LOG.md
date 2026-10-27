@@ -1,5 +1,11 @@
 # Research log
 
+## 2026-10-27 — 05 O'Brien–Fleming boundary
+
+Calibrated O'Brien–Fleming thresholds c·√(K/k) at each look so A/A false-positive rate is 5% (20,000 calibration sims per K). At 100 looks the first look needs |z| > 21.83 versus 2.18 at the final look; Pocock uses 2.865 at every look. With true lift 0.010 and 100 looks, correct-call rate is 89.0% for O'Brien–Fleming versus 76.1% Pocock and 93.5% naive. Tests check nominal FPR and final-look c against classical OBF tables.
+
+Next: Lan–DeMets alpha spending for unplanned look times.
+
 ## 2026-10-26 — 04 Pocock boundary
 
 Calibrated a constant two-sided z boundary at each of K equally spaced looks so A/A false-positive rate is 5% (20,000 calibration sims per K). At 100 looks, z* is 2.865; Pocock FPR is 5.0% versus 37.1% naive and 0.9% Bonferroni. With true lift 0.010 and 100 looks, correct-call rate is 76.1% for Pocock versus 51.4% Bonferroni and 93.5% naive. Tests check nominal FPR after calibration and K=2,5 boundaries against classical Pocock tables.

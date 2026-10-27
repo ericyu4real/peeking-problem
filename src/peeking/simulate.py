@@ -39,12 +39,17 @@ def simulate_aa_z(
 def ever_significant(
     z: np.ndarray,
     alpha: float = 0.05,
-    z_critical: float | None = None,
+    z_critical: float | np.ndarray | None = None,
 ) -> np.ndarray:
     """Whether each simulated test crosses the two-sided threshold at any look."""
     if z_critical is None:
         z_critical = stats.norm.ppf(1 - alpha / 2)
-    return (np.abs(z) >= z_critical).any(axis=1)
+    crit = np.asarray(z_critical)
+    if crit.ndim == 0:
+        return (np.abs(z) >= float(crit)).any(axis=1)
+    if crit.shape != (z.shape[1],):
+        raise ValueError("z_critical must be scalar or length n_looks")
+    return (np.abs(z) >= crit).any(axis=1)
 
 
 def false_positive_rate(
