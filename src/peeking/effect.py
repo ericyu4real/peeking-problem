@@ -188,6 +188,7 @@ def simulate_binomial_looks(
     rate_control: float,
     rate_treatment: float,
     rng: np.random.Generator,
+    batch_sizes: np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Return (z, lift), each with shape (n_sims, n_looks).
 
@@ -195,12 +196,22 @@ def simulate_binomial_looks(
     pooled estimated standard error. lift is p_hat_treatment - p_hat_control.
     Look k is cumulative through batch k.
     """
-    _check_sim_shape(n_sims, n_looks, users_per_look)
+    if batch_sizes is not None:
+        batches = np.asarray(batch_sizes, dtype=int)
+        if batches.shape != (n_looks,):
+            raise ValueError("batch_sizes must have length n_looks")
+        if np.any(batches < 1):
+            raise ValueError("batch_sizes must be positive")
+        users_per_look = int(batches[0])  # for validation only
+    else:
+        batches = None
+    _check_sim_shape(n_sims, n_looks, users_per_look if batches is None else 1)
     _validate_rates(rate_control, rate_treatment)
 
-    conv_c = rng.binomial(users_per_look, rate_control, size=(n_sims, n_looks)).cumsum(axis=1)
-    conv_t = rng.binomial(users_per_look, rate_treatment, size=(n_sims, n_looks)).cumsum(axis=1)
-    n = users_per_look * np.arange(1, n_looks + 1, dtype=float)
+    per_look = batches if batches is not None else users_per_look
+    conv_c = rng.binomial(per_look, rate_control, size=(n_sims, n_looks)).cumsum(axis=1)
+    conv_t = rng.binomial(per_look, rate_treatment, size=(n_sims, n_looks)).cumsum(axis=1)
+    n = np.cumsum(per_look) if batches is not None else users_per_look * np.arange(1, n_looks + 1, dtype=float)
 
     pooled = (conv_c + conv_t) / (2.0 * n)
     se = np.sqrt(pooled * (1.0 - pooled) * (2.0 / n))
@@ -217,6 +228,7 @@ def simulate_normal_looks(
     rate_control: float,
     rate_treatment: float,
     rng: np.random.Generator,
+    batch_sizes: np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Normal-increment version of :func:`simulate_binomial_looks`.
 
@@ -225,20 +237,28 @@ def simulate_normal_looks(
     known pooled null standard error, so a single look lines up with
     :func:`fixed_sample_mean_lift_given_correct`.
     """
-    _check_sim_shape(n_sims, n_looks, users_per_look)
+    if batch_sizes is not None:
+        batches = np.asarray(batch_sizes, dtype=int)
+        if batches.shape != (n_looks,):
+            raise ValueError("batch_sizes must have length n_looks")
+        users_per_look = int(batches[0])
+    else:
+        batches = None
+    _check_sim_shape(n_sims, n_looks, users_per_look if batches is None else 1)
     _validate_rates(rate_control, rate_treatment)
 
     delta = rate_treatment - rate_control
-    var_batch = users_per_look * (
+    per_look = batches if batches is not None else np.full(n_looks, users_per_look)
+    var_batch = per_look * (
         rate_control * (1.0 - rate_control) + rate_treatment * (1.0 - rate_treatment)
     )
     increments = rng.normal(
-        loc=users_per_look * delta,
+        loc=per_look * delta,
         scale=np.sqrt(var_batch),
         size=(n_sims, n_looks),
     )
     cumulative = increments.cumsum(axis=1)
-    n = users_per_look * np.arange(1, n_looks + 1, dtype=float)
+    n = np.cumsum(per_look) if batches is not None else users_per_look * np.arange(1, n_looks + 1, dtype=float)
     lift = cumulative / n
 
     p_bar = 0.5 * (rate_control + rate_treatment)
@@ -329,6 +349,7 @@ def summarize_stopping(
     true_lift: float,
     alpha: float = 0.05,
     z_critical: float | np.ndarray | None = None,
+    cumulative_users: np.ndarray | None = None,
 ) -> StoppingSummary:
     """Reduce per-look z and lift paths to stopping-time summaries.
 
@@ -376,7 +397,13 @@ def summarize_stopping(
 
     reported = lift[:, -1].astype(float).copy()
     reported[crossed] = lift_at_stop[crossed]
-    users = np.where(crossed, users_per_look * (first + 1), users_per_look * n_looks)
+    if cumulative_users is not None:
+        cum = np.asarray(cumulative_users, dtype=float)
+        if cum.shape != (n_looks,):
+            raise ValueError("cumulative_users must have length n_looks")
+        users = np.where(crossed, cum[first], cum[-1])
+    else:
+        users = np.where(crossed, users_per_look * (first + 1), users_per_look * n_looks)
 
     n_correct_by_look = np.bincount(first[correct], minlength=n_looks)
     n_wrong_by_look = np.bincount(first[wrong], minlength=n_looks)
@@ -415,6 +442,7 @@ def peeking_with_effect(
     seed: int = 0,
     model: str = "binomial",
     z_critical: float | np.ndarray | None = None,
+    batch_sizes: np.ndarray | None = None,
 ) -> StoppingSummary:
     """Simulate naive peeking at a fixed sample split into equal looks.
 
@@ -422,7 +450,7 @@ def peeking_with_effect(
     matching normal increments and is the bridge to the truncated-normal
     formulas. The total sample size does not change with the number of looks.
     """
-    if total_users_per_arm % n_looks:
+    if batch_sizes is None and total_users_per_arm % n_looks:
         raise ValueError("total_users_per_arm must be divisible by n_looks")
     if model not in ("binomial", "normal"):
         raise ValueError("model must be 'binomial' or 'normal'")
@@ -431,9 +459,33 @@ def peeking_with_effect(
         raise ValueError("rate_treatment and rate_control must differ")
 
     rng = np.random.default_rng(seed)
-    users_per_look = total_users_per_arm // n_looks
+    if batch_sizes is not None:
+        batches = np.asarray(batch_sizes, dtype=int)
+        if batches.shape != (n_looks,):
+            raise ValueError("batch_sizes must have length n_looks")
+        if int(batches.sum()) != total_users_per_arm:
+            raise ValueError("batch_sizes must sum to total_users_per_arm")
+        users_per_look = int(batches[0])
+        cumulative_users = np.cumsum(batches)
+    else:
+        users_per_look = total_users_per_arm // n_looks
+        cumulative_users = None
     simulator = simulate_binomial_looks if model == "binomial" else simulate_normal_looks
-    z, lift = simulator(n_sims, n_looks, users_per_look, rate_control, rate_treatment, rng)
+    z, lift = simulator(
+        n_sims,
+        n_looks,
+        users_per_look,
+        rate_control,
+        rate_treatment,
+        rng,
+        batch_sizes=batch_sizes,
+    )
     return summarize_stopping(
-        z, lift, users_per_look, true_lift, alpha, z_critical=z_critical
+        z,
+        lift,
+        users_per_look,
+        true_lift,
+        alpha,
+        z_critical=z_critical,
+        cumulative_users=cumulative_users,
     )

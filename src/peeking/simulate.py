@@ -36,6 +36,32 @@ def simulate_aa_z(
     return z
 
 
+def simulate_aa_z_batches(
+    n_sims: int,
+    batch_sizes: np.ndarray,
+    base_rate: float,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    """Two-proportion z statistics with shape (n_sims, n_looks) for variable batch sizes."""
+    batches = np.asarray(batch_sizes, dtype=int)
+    if batches.ndim != 1 or batches.size < 1:
+        raise ValueError("batch_sizes must be a one-dimensional array")
+    if np.any(batches < 1):
+        raise ValueError("batch_sizes must be positive")
+    if not 0.0 < base_rate < 1.0:
+        raise ValueError("base_rate must be strictly between 0 and 1")
+    n_looks = batches.size
+    conv_a = rng.binomial(batches, base_rate, size=(n_sims, n_looks)).cumsum(axis=1)
+    conv_b = rng.binomial(batches, base_rate, size=(n_sims, n_looks)).cumsum(axis=1)
+    n = np.cumsum(batches)
+    pooled = (conv_a + conv_b) / (2 * n)
+    se = np.sqrt(pooled * (1 - pooled) * (2 / n))
+    diff = (conv_a - conv_b) / n
+    with np.errstate(divide="ignore", invalid="ignore"):
+        z = np.where(se > 0, diff / se, 0.0)
+    return z
+
+
 def ever_significant(
     z: np.ndarray,
     alpha: float = 0.05,
@@ -44,7 +70,7 @@ def ever_significant(
     """Whether each simulated test crosses the two-sided threshold at any look."""
     if z_critical is None:
         z_critical = stats.norm.ppf(1 - alpha / 2)
-    crit = np.asarray(z_critical)
+    crit = np.asarray(z_critical, dtype=float)
     if crit.ndim == 0:
         return (np.abs(z) >= float(crit)).any(axis=1)
     if crit.shape != (z.shape[1],):

@@ -176,6 +176,37 @@ With 100 daily looks and a 0.010 lift, O'Brien–Fleming calls the winner correc
 
 ![O'Brien–Fleming vs Pocock](results/05_obrien_fleming.png)
 
+### 06 · Lan–DeMets alpha spending (irregular peek times)
+
+Same 20,000 users per arm and 10% control rate. Lan–DeMets uses O'Brien–Fleming alpha spending: at information fraction ``t`` (cumulative users divided by the planned total), the two-sided z threshold comes from the cumulative Type I error ``2 - 2 Φ(c/√t)``, with ``c`` calibrated on equal batches so the overall A/A error rate is 5% (matching experiment 05). Naive peeking still uses p < 0.05 at every look.
+
+Two peek schedules share the same planned total: **equal** batches of 2,000, and **irregular** batches ``[500, 500, 1000, 1500, 2000, 2500, 3000, 4000, 3500, 1500]``. **Mis-indexed OBF** applies boundaries for fraction ``k/10`` at look ``k`` even when the true information fraction differs (what happens if peek times shift but the analyst keeps the old boundary table).
+
+| Schedule | Naive FPR | Lan–DeMets FPR | Mis-indexed OBF FPR |
+|----------|----------:|---------------:|--------------------:|
+| equal | 19.2% | 5.0% | 5.0% |
+| irregular | 23.9% | 4.8% | 5.7% |
+
+On equal batches, Lan–DeMets matches calibrated O'Brien–Fleming (5.0% FPR). Irregular peeks inflate naive error to 23.9%; Lan–DeMets stays near 5%. Treating the look index as the information fraction is slightly anti-conservative here (5.7%).
+
+Power (first significant result in the true direction), true lift 0.005:
+
+| Schedule | Naive correct | Lan–DeMets correct |
+|----------|--------------:|-------------------:|
+| equal | 51.5% | 36.6% |
+| irregular | 52.2% | 36.2% |
+
+True lift 0.010:
+
+| Schedule | Naive correct | Lan–DeMets correct |
+|----------|--------------:|-------------------:|
+| equal | 93.4% | 89.1% |
+| irregular | 93.1% | 89.3% |
+
+On the irregular schedule with lift 0.010, Lan–DeMets still calls the winner correctly 89.3% of the time versus 93.1% naive, while holding the A/A error rate at 4.8%.
+
+![Lan–DeMets on irregular peeks](results/06_lan_demets.png)
+
 ## Layout
 
 - `src/peeking/` — simulation and stopping-rule code
@@ -194,6 +225,7 @@ python scripts/02_winner_curse.py
 python scripts/03_bonferroni.py
 python scripts/04_pocock.py
 python scripts/05_obrien_fleming.py
+python scripts/06_lan_demets.py
 ```
 
 ## License

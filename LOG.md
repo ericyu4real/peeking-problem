@@ -1,5 +1,11 @@
 # Research log
 
+## 2026-10-28 — 06 Lan–DeMets alpha spending
+
+Implemented O'Brien–Fleming alpha spending with boundaries keyed to information fraction (cumulative sample / planned total), using the same binomial-calibrated multiplier ``c`` as experiment 05. On 10 looks and 20,000 users per arm, equal batches give Lan–DeMets FPR 5.0% (same as calibrated OBF). An irregular front-loaded schedule (500-user early peeks up to 4,000-user batches) gives naive FPR 23.9% versus Lan–DeMets 4.8%; mis-indexing look ``k`` as fraction ``k/K`` instead of the true information fraction yields 5.7%. With true lift 0.010, correct-call rate is 89.3% on the irregular schedule versus 93.1% naive. Tests check spending at ``t=1``, equal-batch boundaries matching OBF, and nominal FPR on both schedules.
+
+Next: mSPRT for two proportions.
+
 ## 2026-10-27 — 05 O'Brien–Fleming boundary
 
 Calibrated O'Brien–Fleming thresholds c·√(K/k) at each look so A/A false-positive rate is 5% (20,000 calibration sims per K). At 100 looks the first look needs |z| > 21.83 versus 2.18 at the final look; Pocock uses 2.865 at every look. With true lift 0.010 and 100 looks, correct-call rate is 89.0% for O'Brien–Fleming versus 76.1% Pocock and 93.5% naive. Tests check nominal FPR and final-look c against classical OBF tables.

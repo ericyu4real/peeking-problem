@@ -1,0 +1,5 @@
+schedule,true_lift,naive_p_correct,lan_demets_p_correct,obf_p_correct_equal_only,naive_p_inconclusive,lan_demets_p_inconclusive,n_sims
+equal,0.005,0.5153,0.3656,0.3656,0.4734,0.6340,20000
+irregular,0.005,0.5221,0.3624,,0.4498,0.6375,20000
+equal,0.010,0.9344,0.8911,0.8911,0.0634,0.1089,20000
+irregular,0.010,0.9307,0.8929,,0.0583,0.1071,20000

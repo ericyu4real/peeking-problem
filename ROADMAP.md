@@ -8,11 +8,11 @@ Each item should fit in one focused session: code + tests + a short write-up. Sp
 - [x] 02 Peeking with a real effect: does early stopping still reach the right answer, and how biased is the estimated lift at stopping time? (winner's curse)
 - [x] 03 Bonferroni across looks: simple fix, measure how much power it loses
 - [x] 04 Pocock boundary: constant threshold calibrated by simulation to give 5% overall
+- [x] 05 O'Brien–Fleming boundary: strict early, lenient late; compare power with Pocock
+- [x] 06 Lan–DeMets alpha spending: allow unplanned / irregular look times
 
 ## Next
 
-- [x] 05 O'Brien–Fleming boundary: strict early, lenient late; compare power with Pocock
-- [ ] 06 Lan–DeMets alpha spending: allow unplanned / irregular look times
 - [ ] 07 mSPRT (mixture sequential probability ratio test) for two proportions
 - [ ] 08 Always-valid p-values from mSPRT; verify the false-positive rate holds under continuous monitoring
 - [ ] 09 Sensitivity of mSPRT to the mixing variance; how to choose it
@@ -32,3 +32,4 @@ Each item should fit in one focused session: code + tests + a short write-up. Sp
 - Analytical approximation vs simulation for naive peeking (Brownian-motion crossing)
 - Median-unbiased estimate of the lift at the look where a naive peeking test stops
 - If collection runs to the planned end anyway, how biased is that final lift conditional on an earlier look already having p < 0.05?
+- Pocock alpha spending via Lan–DeMets on irregular schedules (compare to OBF spending)
