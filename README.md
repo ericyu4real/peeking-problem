@@ -207,6 +207,36 @@ On the irregular schedule with lift 0.010, Lan–DeMets still calls the winner c
 
 ![Lan–DeMets on irregular peeks](results/06_lan_demets.png)
 
+### 07 · mSPRT for two proportions
+
+Same batching as before: 20,000 users per arm, 10% control rate, equal batches. The mixture SPRT uses a normal prior N(0, τ²) on the lift with τ = 0.01 (10% of the baseline rate). At each look, treatment and control cumulative conversions give an estimated lift Δ̂ and variance V = p̂_c(1−p̂_c)/n + p̂_t(1−p̂_t)/n; stop when the mixture likelihood ratio Λ ≥ 1/α (α = 0.05, so Λ ≥ 20). Naive peeking and calibrated Pocock from experiment 04 are included for comparison. 20,000 simulations per point.
+
+| Looks | Naive FPR | mSPRT FPR | Pocock FPR |
+|------:|----------:|----------:|-----------:|
+| 1 | 5.0% | 0.3% | 5.0% |
+| 10 | 19.2% | 0.9% | 5.0% |
+| 100 | 37.1% | 1.7% | 5.0% |
+
+The mSPRT threshold is always-valid under continuous monitoring, so the simulated A/A error rate stays at or below 5%; with τ = 0.01 it is conservative (1.7% at 100 looks). Power is the share of simulations with a first significant result in the true direction (lifts 0.005 and 0.010 as in experiment 02).
+
+True lift 0.005:
+
+| Looks | Naive correct | mSPRT correct | Pocock correct |
+|------:|--------------:|--------------:|---------------:|
+| 10 | 51.5% | 12.6% | 27.8% |
+| 100 | 59.7% | 15.6% | 22.0% |
+
+True lift 0.010:
+
+| Looks | Naive correct | mSPRT correct | Pocock correct |
+|------:|--------------:|--------------:|---------------:|
+| 10 | 93.4% | 64.8% | 81.3% |
+| 100 | 93.5% | 68.9% | 76.1% |
+
+With 100 daily looks and a 0.010 lift, mSPRT calls the winner correctly 68.9% of the time versus 76.1% for Pocock and 93.5% naive, while the A/A error rate is 1.7% instead of 37.1%. The default mixing variance trades power for strict anytime error control; sensitivity to τ is experiment 09.
+
+![mSPRT vs naive and Pocock](results/07_msprt.png)
+
 ## Layout
 
 - `src/peeking/` — simulation and stopping-rule code
@@ -226,6 +256,7 @@ python scripts/03_bonferroni.py
 python scripts/04_pocock.py
 python scripts/05_obrien_fleming.py
 python scripts/06_lan_demets.py
+python scripts/07_msprt.py
 ```
 
 ## License

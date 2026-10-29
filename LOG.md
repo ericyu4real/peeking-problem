@@ -1,5 +1,11 @@
 # Research log
 
+## 2026-10-29 — 07 mSPRT for two proportions
+
+Implemented the Bernoulli mixture likelihood ratio with a normal N(0, τ²) prior on the lift (default τ = 0.01). Stop when Λ ≥ 20 (α = 0.05). On equal batches with 20,000 users per arm, mSPRT A/A false-positive rate is 0.9% at 10 looks and 1.7% at 100 looks versus 19.2% and 37.1% naive; Pocock stays at 5.0%. With true lift 0.010 and 100 looks, correct-call rate is 68.9% for mSPRT versus 76.1% Pocock and 93.5% naive. Tests check the null closed form, single-look FPR ≤ α, and nominal error control across the look grid.
+
+Next: always-valid p-values from mSPRT (experiment 08).
+
 ## 2026-10-28 — 06 Lan–DeMets alpha spending
 
 Implemented O'Brien–Fleming alpha spending with boundaries keyed to information fraction (cumulative sample / planned total), using the same binomial-calibrated multiplier ``c`` as experiment 05. On 10 looks and 20,000 users per arm, equal batches give Lan–DeMets FPR 5.0% (same as calibrated OBF). An irregular front-loaded schedule (500-user early peeks up to 4,000-user batches) gives naive FPR 23.9% versus Lan–DeMets 4.8%; mis-indexing look ``k`` as fraction ``k/K`` instead of the true information fraction yields 5.7%. With true lift 0.010, correct-call rate is 89.3% on the irregular schedule versus 93.1% naive. Tests check spending at ``t=1``, equal-batch boundaries matching OBF, and nominal FPR on both schedules.

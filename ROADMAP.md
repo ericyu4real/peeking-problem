@@ -13,7 +13,7 @@ Each item should fit in one focused session: code + tests + a short write-up. Sp
 
 ## Next
 
-- [ ] 07 mSPRT (mixture sequential probability ratio test) for two proportions
+- [x] 07 mSPRT (mixture sequential probability ratio test) for two proportions
 - [ ] 08 Always-valid p-values from mSPRT; verify the false-positive rate holds under continuous monitoring
 - [ ] 09 Sensitivity of mSPRT to the mixing variance; how to choose it
 - [ ] 10 Bayesian "stop when P(B > A) > 95%": does it control false positives? (spoiler: check it)
