@@ -10,11 +10,11 @@ Each item should fit in one focused session: code + tests + a short write-up. Sp
 - [x] 04 Pocock boundary: constant threshold calibrated by simulation to give 5% overall
 - [x] 05 O'Brien–Fleming boundary: strict early, lenient late; compare power with Pocock
 - [x] 06 Lan–DeMets alpha spending: allow unplanned / irregular look times
+- [x] 07 mSPRT (mixture sequential probability ratio test) for two proportions
+- [x] 08 Always-valid p-values from mSPRT; verify the false-positive rate holds under continuous monitoring
 
 ## Next
 
-- [x] 07 mSPRT (mixture sequential probability ratio test) for two proportions
-- [ ] 08 Always-valid p-values from mSPRT; verify the false-positive rate holds under continuous monitoring
 - [ ] 09 Sensitivity of mSPRT to the mixing variance; how to choose it
 - [ ] 10 Bayesian "stop when P(B > A) > 95%": does it control false positives? (spoiler: check it)
 - [ ] 11 Bayesian expected-loss stopping rule

@@ -237,6 +237,19 @@ With 100 daily looks and a 0.010 lift, mSPRT calls the winner correctly 68.9% of
 
 ![mSPRT vs naive and Pocock](results/07_msprt.png)
 
+### 08 · Always-valid p-values under continuous monitoring
+
+Same 20,000 users per arm and 10% control rate. At each monitoring time the mixture likelihood ratio Λ gives an always-valid p-value ``p_t = min(1, 1 / max_{s≤t} Λ_s)``; stop at the first ``p_t ≤ 0.05`` (equivalent to ``Λ ≥ 20``). **Naive continuous** reuses the usual two-proportion z-test p-value at every check and stops at the first ``p < 0.05`` (not valid under optional stopping). **Coarse naive** is experiment 01 with 10 equal batches for reference.
+
+| Check interval (users per arm) | Checks | Naive continuous FPR | Always-valid mSPRT FPR |
+|-------------------------------:|-------:|---------------------:|-----------------------:|
+| 100 | 200 | 42.2% | 1.8% |
+| 50 | 400 | 46.4% | 1.9% |
+
+At 10 coarse looks, naive FPR is 19.2%. More frequent naive checks push error toward roughly 42–46%; always-valid mSPRT p-values stay at or below the nominal 5% (1.8–1.9% with τ = 0.01). Stopping on ``p_t ≤ α`` matches stopping on ``Λ ≥ 1/α`` on every simulated path.
+
+![Always-valid p under continuous monitoring](results/08_always_valid.png)
+
 ## Layout
 
 - `src/peeking/` — simulation and stopping-rule code
@@ -257,6 +270,7 @@ python scripts/04_pocock.py
 python scripts/05_obrien_fleming.py
 python scripts/06_lan_demets.py
 python scripts/07_msprt.py
+python scripts/08_always_valid_msprt.py
 ```
 
 ## License

@@ -106,6 +106,34 @@ def first_stop_msprt(
     return first
 
 
+def running_max_lambda(lambda_path: np.ndarray) -> np.ndarray:
+    """Running maximum of the mixture likelihood ratio along each path."""
+    if lambda_path.ndim != 2:
+        raise ValueError("lambda_path must be two-dimensional")
+    return np.maximum.accumulate(lambda_path, axis=1)
+
+
+def always_valid_p_path(lambda_path: np.ndarray) -> np.ndarray:
+    """Always-valid p-values p_t = min(1, 1 / max_{s<=t} Lambda_s) (Johari et al., 2017)."""
+    m = running_max_lambda(lambda_path)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        p = np.where(m > 0.0, np.minimum(1.0, 1.0 / m), 1.0)
+    return p
+
+
+def first_stop_always_valid_p(
+    p_path: np.ndarray,
+    alpha: float = 0.05,
+) -> np.ndarray:
+    """Index of the first look with always-valid p <= alpha, or -1."""
+    if p_path.ndim != 2:
+        raise ValueError("p_path must be two-dimensional")
+    crossed = p_path <= alpha
+    first = np.argmax(crossed, axis=1).astype(int)
+    first[~crossed.any(axis=1)] = -1
+    return first
+
+
 def simulate_aa_counts(
     n_sims: int,
     n_looks: int,
@@ -163,6 +191,29 @@ def false_positive_rate_msprt(
     n = users_per_look * np.arange(1, n_looks + 1)
     lambdas = lambda_path_from_counts(conv_c, conv_t, n, tau)
     return float((first_stop_msprt(lambdas, alpha) >= 0).mean())
+
+
+def false_positive_rate_always_valid_msprt(
+    n_looks: int,
+    total_users_per_arm: int = 20_000,
+    base_rate: float = 0.10,
+    alpha: float = 0.05,
+    tau: float | None = None,
+    n_sims: int = 20_000,
+    seed: int = 0,
+) -> float:
+    """A/A false-positive rate when stopping at the first always-valid p <= alpha."""
+    if total_users_per_arm % n_looks:
+        raise ValueError("total_users_per_arm must be divisible by n_looks")
+    if tau is None:
+        tau = default_tau(base_rate)
+    rng = np.random.default_rng(seed)
+    users_per_look = total_users_per_arm // n_looks
+    conv_c, conv_t = simulate_aa_counts(n_sims, n_looks, users_per_look, base_rate, rng)
+    n = users_per_look * np.arange(1, n_looks + 1)
+    lambdas = lambda_path_from_counts(conv_c, conv_t, n, tau)
+    p_path = always_valid_p_path(lambdas)
+    return float((first_stop_always_valid_p(p_path, alpha) >= 0).mean())
 
 
 def _msprt_significant_z(

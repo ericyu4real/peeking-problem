@@ -1,5 +1,11 @@
 # Research log
 
+## 2026-10-30 — 08 Always-valid p-values from mSPRT
+
+Defined always-valid p-values ``p_t = min(1, 1/max Λ)`` from the experiment 07 mixture ratio; stopping on ``p_t ≤ 0.05`` is pathwise identical to ``Λ ≥ 20``. On A/A paths with 20,000 users per arm, checking every 100 users (200 looks) gives naive continuous FPR 42.2% versus 1.8% for always-valid mSPRT; every 50 users (400 looks) gives 46.4% versus 1.9%. Coarse naive peeking at 10 batches stays at 19.2%. Tests check non-increasing ``p_t``, equivalence of the two stopping rules, and nominal error control on dense schedules.
+
+Next: sensitivity of mSPRT to mixing variance (experiment 09).
+
 ## 2026-10-29 — 07 mSPRT for two proportions
 
 Implemented the Bernoulli mixture likelihood ratio with a normal N(0, τ²) prior on the lift (default τ = 0.01). Stop when Λ ≥ 20 (α = 0.05). On equal batches with 20,000 users per arm, mSPRT A/A false-positive rate is 0.9% at 10 looks and 1.7% at 100 looks versus 19.2% and 37.1% naive; Pocock stays at 5.0%. With true lift 0.010 and 100 looks, correct-call rate is 68.9% for mSPRT versus 76.1% Pocock and 93.5% naive. Tests check the null closed form, single-look FPR ≤ α, and nominal error control across the look grid.
