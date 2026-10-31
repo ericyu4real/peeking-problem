@@ -1,5 +1,11 @@
 # Research log
 
+## 2026-10-31 — 09 mSPRT sensitivity to mixing variance τ
+
+Swept τ from 2% to 50% of the 10% baseline on 100 equal looks (20,000 users per arm, 20,000 sims). A/A false-positive rate rises from 0.01% at τ = 0.002 to 2.26% at τ = 0.02, all at or below 5%. With true lift 0.010, correct-call rate peaks at 68.9% for the default τ = 0.01 versus 10.2% at τ = 0.002 and 56.7% at τ = 0.05; lift 0.005 stays below 15.6% across the grid. Tests check null-ratio monotonicity in τ, nominal error control across τ, and higher power when τ matches detectable effects.
+
+Next: Bayesian stop when P(B > A) > 95% (experiment 10).
+
 ## 2026-10-30 — 08 Always-valid p-values from mSPRT
 
 Defined always-valid p-values ``p_t = min(1, 1/max Λ)`` from the experiment 07 mixture ratio; stopping on ``p_t ≤ 0.05`` is pathwise identical to ``Λ ≥ 20``. On A/A paths with 20,000 users per arm, checking every 100 users (200 looks) gives naive continuous FPR 42.2% versus 1.8% for always-valid mSPRT; every 50 users (400 looks) gives 46.4% versus 1.9%. Coarse naive peeking at 10 batches stays at 19.2%. Tests check non-increasing ``p_t``, equivalence of the two stopping rules, and nominal error control on dense schedules.

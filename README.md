@@ -250,6 +250,34 @@ At 10 coarse looks, naive FPR is 19.2%. More frequent naive checks push error to
 
 ![Always-valid p under continuous monitoring](results/08_always_valid.png)
 
+### 09 · mSPRT sensitivity to mixing variance τ
+
+Same batching as experiment 07: 20,000 users per arm, 10% control rate, 100 equal looks, α = 0.05 (Λ ≥ 20). τ is the standard deviation of the normal prior on the absolute lift; values below are stated as a fraction of the 10% baseline (τ = 0.01 is the default 10% rule from experiment 07). 20,000 simulations per cell.
+
+| τ (fraction of baseline) | A/A false-positive rate |
+|-------------------------:|------------------------:|
+| 2% (0.002) | 0.01% |
+| 5% (0.005) | 0.65% |
+| 10% (0.010) | 1.69% |
+| 20% (0.020) | 2.26% |
+| 50% (0.050) | 2.03% |
+
+Larger τ pushes the A/A error rate up toward the nominal 5% cap but stays below it; very small τ is ultra-conservative on false positives.
+
+Correct-call rate at 100 looks (first significant mSPRT stop in the true direction):
+
+| τ | True lift 0.005 | True lift 0.010 |
+|--:|----------------:|----------------:|
+| 2% | 0.27% | 10.16% |
+| 5% | 10.50% | 61.43% |
+| 10% | 15.57% | 68.89% |
+| 20% | 14.64% | 65.83% |
+| 50% | 10.48% | 56.69% |
+
+Power is highest when τ is on the same scale as the effect you care about: at lift 0.010, τ = 10% of baseline (0.01) gives 68.9% correct calls versus 10.2% at τ = 2% and 56.7% at τ = 50%. For the smaller lift 0.005, power stays below 16% across this grid; a tighter prior does not help much once τ is already small. A practical default is τ ≈ 10% of the baseline rate, or set τ near the smallest lift you would want to detect quickly.
+
+![mSPRT sensitivity to tau](results/09_msprt_tau_sensitivity.png)
+
 ## Layout
 
 - `src/peeking/` — simulation and stopping-rule code
@@ -271,6 +299,7 @@ python scripts/05_obrien_fleming.py
 python scripts/06_lan_demets.py
 python scripts/07_msprt.py
 python scripts/08_always_valid_msprt.py
+python scripts/09_msprt_tau_sensitivity.py
 ```
 
 ## License

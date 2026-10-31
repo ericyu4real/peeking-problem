@@ -15,7 +15,7 @@ Each item should fit in one focused session: code + tests + a short write-up. Sp
 
 ## Next
 
-- [ ] 09 Sensitivity of mSPRT to the mixing variance; how to choose it
+- [x] 09 Sensitivity of mSPRT to the mixing variance; how to choose it
 - [ ] 10 Bayesian "stop when P(B > A) > 95%": does it control false positives? (spoiler: check it)
 - [ ] 11 Bayesian expected-loss stopping rule
 - [ ] 12 Head-to-head: false-positive rate, power, expected sample size, and bias of the estimated lift for every method at several effect sizes
